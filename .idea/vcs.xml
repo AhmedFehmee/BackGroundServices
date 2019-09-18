@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/BackGroundServices" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Chat/android_php_gcm_realtime_chat_app/gcm_chat" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ExpandableList/Treeview" vcs="hg4idea" />
+    <mapping directory="$PROJECT_DIR$/RetrofitTutorial" vcs="Git" />
+  </component>
+</project>

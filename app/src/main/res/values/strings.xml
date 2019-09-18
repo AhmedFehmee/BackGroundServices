@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Background Services</string>
+    <string name="service_is_disconnected">Disconnected!</string>
+    <string name="service_is_connected">Connected</string>
+    <string name="turn_on">Turn on</string>
+    <string name="turn_off">Turn off</string>
+
+    <string name="job_intent">Job Intent</string>
+    <string name="work_manager">Work Manager</string>
+</resources>
