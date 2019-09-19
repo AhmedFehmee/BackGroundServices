@@ -19,11 +19,11 @@
         </activity>
 
         <service
-            android:name="com.fahmy.background_service.utils.BreathingBackgroundService"
+            android:name="com.fahmy.background_service.utils.JobIntent.BackgroundService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <receiver
-            android:name="com.fahmy.background_service.utils.RestartService"
+            android:name="com.fahmy.background_service.utils.JobIntent.RestartService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

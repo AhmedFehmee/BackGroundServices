@@ -10,8 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.work.*
 import androidx.lifecycle.Observer
 import com.fahmy.background_service.R
-import com.fahmy.background_service.utils.BreathingBackgroundService
-import com.fahmy.background_service.utils.RestartService
+import com.fahmy.background_service.utils.JobIntent.BackgroundService
+import com.fahmy.background_service.utils.JobIntent.RestartService
 import com.fahmy.background_service.utils.workManager.CountWorker
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
                 "${(!isMyServiceRunning())}"
             )
             if (!isMyServiceRunning()) {
-                BreathingBackgroundService.startRefreshingToken(this)
+                BackgroundService.startRefreshingToken(this)
             } else {
                 Toast.makeText(this, "Service already running ", Toast.LENGTH_LONG).show()
             }
@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         for (service in manager.getRunningServices(Integer.MAX_VALUE)) {
             Log.i("/// isMyService", service.service.className)
 
-            if (service.service.className == BreathingBackgroundService()::class.java.name) {
+            if (service.service.className == BackgroundService()::class.java.name) {
                 Log.i("isMyServiceRunning?", true.toString() + "")
                 btn_run_service_job_intent.text = getString(R.string.service_is_connected)
             } else {
