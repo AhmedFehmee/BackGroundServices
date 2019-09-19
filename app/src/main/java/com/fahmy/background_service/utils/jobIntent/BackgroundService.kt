@@ -1,4 +1,4 @@
-package com.fahmy.background_service.utils.JobIntent
+package com.fahmy.background_service.utils.jobIntent
 
 import android.app.ActivityManager
 import android.app.ActivityManager.RunningAppProcessInfo
@@ -15,7 +15,7 @@ class BackgroundService : JobIntentService() {
     private var timerTask: TimerTask? = null
 
     override fun onHandleWork(p0: Intent) {
-        Log.i("Running", " Start")
+        Log.i("Running", "/// Start")
 
         startTimer()
     }
@@ -24,7 +24,7 @@ class BackgroundService : JobIntentService() {
         timer = Timer()
         timerTask = object : TimerTask() {
             override fun run() {
-                Log.i("Running", "App is Running in ${isAppOnForeground(applicationContext)}")
+                Log.i("Running", "/// App is Running in ${isAppOnForeground(applicationContext)}")
             }
         }
         timer?.schedule(timerTask, 1000, 1000)
@@ -46,21 +46,15 @@ class BackgroundService : JobIntentService() {
         private const val JOB_ID = 1
 
         private fun enqueueWork(context: Context, work: Intent) {
-            enqueueWork(context, BackgroundService::class.java,
-                JOB_ID, work)
+            enqueueWork(context, BackgroundService::class.java, JOB_ID, work)
         }
 
-        fun startRefreshingToken(context: Context) {
-            stopCurrent(
-                context
-            )
-            enqueueWork(
-                context,
-                Intent()
-            )
+        fun startBackGroundServices(context: Context) {
+            stopCurrent(context)
+            enqueueWork(context, Intent())
         }
 
-        private fun stopCurrent(context: Context) {
+        fun stopCurrent(context: Context) {
             context.stopService(Intent(context, BackgroundService::class.java))
         }
     }

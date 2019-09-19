@@ -5,13 +5,14 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.work.*
 import androidx.lifecycle.Observer
 import com.fahmy.background_service.R
-import com.fahmy.background_service.utils.JobIntent.BackgroundService
-import com.fahmy.background_service.utils.JobIntent.RestartService
+import com.fahmy.background_service.utils.jobIntent.BackgroundService
+import com.fahmy.background_service.utils.jobIntent.RestartService
 import com.fahmy.background_service.utils.workManager.CountWorker
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -25,23 +26,19 @@ class MainActivity : AppCompatActivity() {
         // job intent (start service when user destroyed the app
         // app will fire broadcast to restart the service)
         btn_run_service_job_intent.setOnClickListener {
-            Log.i(
-                "///isMyService",
-                "${(!isMyServiceRunning())}"
-            )
-            if (!isMyServiceRunning()) {
-                BackgroundService.startRefreshingToken(this)
+            if (!isMyServiceRunning(BackgroundService()::class.java.name)) {
+                BackgroundService.startBackGroundServices(this)
             } else {
+                BackgroundService.stopCurrent(this)
                 Toast.makeText(this, "Service already running ", Toast.LENGTH_LONG).show()
             }
-            isMyServiceRunning()
         }
 
         // work manager
         // It replaces JobScheduler as Google’s recommended way to enqueue background work
         btn_run_service_work_manager.setOnClickListener {
             startWorkManagerJob()
-            isMyServiceRunning()
+            isMyServiceRunning("androidx.work.impl.background.systemjob.SystemJobService")
         }
     }
 
@@ -64,11 +61,7 @@ class MainActivity : AppCompatActivity() {
             // observe work status
             getWorkInfoByIdLiveData(workId)
                 .observe(this@MainActivity, Observer { status ->
-                    if (status.state.isFinished)
-                        btn_run_service_work_manager.text =
-                            getString(R.string.service_is_disconnected)
-                    else
-                        btn_run_service_work_manager.text = getString(R.string.service_is_connected)
+                    setStyleOfButton(btn_run_service_work_manager, status.state.isFinished)
 
                     val isFinished = status?.state?.isFinished
                     Log.d(TAG, "/////////// Job $workId; finished: $isFinished")
@@ -79,30 +72,41 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        isMyServiceRunning()
+        isMyServiceRunning(BackgroundService()::class.java.name)
         super.onResume()
     }
 
-    private fun isMyServiceRunning(): Boolean {
+    private fun isMyServiceRunning(serviceClass: String): Boolean {
         val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         for (service in manager.getRunningServices(Integer.MAX_VALUE)) {
-            Log.i("/// isMyService", service.service.className)
+            Log.i("/// isMyService", "$serviceClass and service ${service.service.className} ${manager.getRunningServices(Integer.MAX_VALUE).size}")
 
-            if (service.service.className == BackgroundService()::class.java.name) {
-                Log.i("isMyServiceRunning?", true.toString() + "")
-                btn_run_service_job_intent.text = getString(R.string.service_is_connected)
-            } else {
-                btn_run_service_job_intent.text = getString(R.string.service_is_disconnected)
+            when (serviceClass) {
+                service.service.className -> {
+                    setStyleOfButton(btn_run_service_job_intent, true)
+                    return true
+                }
+                service.service.className -> {
+                    setStyleOfButton(btn_run_service_work_manager, true)
+                    return true
+                }
+                else -> {
+                    setStyleOfButton(btn_run_service_job_intent, false)
+                    setStyleOfButton(btn_run_service_work_manager, false)
+                }
             }
-
-            if (service.service.className == "androidx.work.impl.background.systemjob.SystemJobService")
-                btn_run_service_work_manager.text = getString(R.string.service_is_connected)
-            else
-                btn_run_service_work_manager.text = getString(R.string.service_is_disconnected)
         }
-        Log.i("isMyServiceRunning?", false.toString() + "")
-
         return false
+    }
+
+    private fun setStyleOfButton(view: Button, isConnected: Boolean) {
+        if (isConnected) {
+            view.text = getString(R.string.service_is_connected)
+            view.setBackgroundColor(resources.getColor(R.color.colorPrimary))
+        } else {
+            view.text = getString(R.string.service_is_disconnected)
+            view.setBackgroundColor(resources.getColor(R.color.colorAccent))
+        }
     }
 
     override fun onDestroy() {
